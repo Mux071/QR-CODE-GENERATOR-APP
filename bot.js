@@ -10,33 +10,25 @@ const client = new Client({
   ],
 });
 
-client.on("ready", () => {
+client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!qrcode")) {
-    const text = message.content.replace("!qrcode ", "").trim();
+    const text = message.content.slice(8).trim(); // Remove '!qrcode ' prefix
 
     if (!text) {
       return message.reply("Please provide text to generate a QR code.");
     }
 
     try {
-      // Generate QR code as a buffer (no need to convert from DataURL)
-      const qrCodeBuffer = await QRCode.toBuffer(text);
-
-      // Send the QR code image as an attachment
+      const qrCodeBuffer = await QRCode.toBuffer(text); // Generate QR code
       message.reply({
-        files: [
-          {
-            attachment: qrCodeBuffer,
-            name: "qrcode.png",
-          },
-        ],
+        files: [{ attachment: qrCodeBuffer, name: "qrcode.png" }],
       });
     } catch (err) {
-      console.error(err); // Log error to console for debugging
+      console.error(err);
       message.reply("Failed to generate QR code.");
     }
   }
